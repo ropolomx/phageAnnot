@@ -3,7 +3,7 @@
 |myRAST    | Protein prediction | Yes | Roughly equivalent|
 |BLASTP/PSI-BLAST| Search homologues of predicted proteins | No | No |
 |WebGeSTer | Identification of Rho-dependent terminators | No | No |
-|TransTermHP | Identification of Rho-dependent terminators | No | Yes |
+|TransTermHP | Identification of Rho-dependent terminators | Yes | No |
 |Neural Network Promoter prediction | self-explanatory | No | No |
 |Aragorn | tRNA prediction | Yes | Yes (same software) |
 |TMHMM | Trans-membrane domains | Yes | Yes (SignalP)|
