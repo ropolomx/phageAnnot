@@ -39,7 +39,7 @@ def parseGenbankInfo(recs):
     for r in recs:
         for feature in r.features:
             if feature.type == "CDS":
-                headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0])
+                headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0]])
                 descriptions.append(feature.qualifiers['product'][0]]))
                 translations.append(feature.qualifiers['translation'][0])
 

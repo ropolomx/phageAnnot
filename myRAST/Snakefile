@@ -41,7 +41,7 @@ rule spades:
 rule genbank_to_fastas:
     input: '{myrast}.gbk'
     output: amino='{myrast}_aa.fasta', nt='{myrast}_genome.fasta'
-    script: '../myRASTtoFASTA.py {input}'
+    script: '../annotationToFASTA.py {input}'
 
 # Homolog search with psiblast
 rule psiblast:
