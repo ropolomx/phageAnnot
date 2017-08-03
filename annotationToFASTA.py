@@ -23,7 +23,6 @@ def readGenbank(myRast):
 
     return myRASTGB
 
-
 def parseGenbankInfo(recs):
 
     """
@@ -45,7 +44,6 @@ def parseGenbankInfo(recs):
                 translations.append(feature.qualifiers['translation'][0])
 
     return headers, descriptions, translations
-
 
 
 def zipSeqRecords(headers, descriptions, translations):

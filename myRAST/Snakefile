@@ -5,8 +5,6 @@ configfile: "config.yaml"
 
 PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
 
-FINAL = expand("mafft/{sample}_aligned.fasta", sample=SAMPLE)
-
 rule all:
     input: 'report.html'
 
@@ -40,35 +38,25 @@ rule spades:
 #    output: 'myRAST/{sample}.gbk'
 #    shell: 'myrast'
 
-rule genbank_to_aa_fasta:
+rule genbank_to_fastas:
     input: '{myrast}.gbk'
-    output: '{myrast}.fasta'
+    output: amino='{myrast}_aa.fasta', nt='{myrast}_genome.fasta'
     script: '../myRASTtoFASTA.py {input}'
-
-#Need to write script for this, or add function to script above
-
-rule genbank_to_genome_fasta:
-    input: '{myrast}.gbk'
-    output: '{myrast}_complete_genome.gbk'
 
 # Homolog search with psiblast
 rule psiblast:
-    input: '{myrast}.fasta'
+    input: '{phage}_aa.fasta'
     output: 'psiblast/{phage}_psiblast.tab'
     shell: 'psiblast -i {input} -db {config[blastdb]} -o {output}'
 
 # Promoter prediction: need to download neural network software
 
 # Search for rho-dependent terminators
-rule transterm_terminator:
-    input: '{myrast}.fasta'
-    output: 'transterm/{transterm}.tt'
-    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
 
-#rule compare_annotations:
-#    input: ''
-#    output: 'mafft/{sample}_aligned.fasta'
-#    shell: 'mafft {input} > {output}'
+#rule transterm_terminator:
+#    input: '{myrast}_aa.fasta'
+#    output: 'transterm/{transterm}.tt'
+#    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
 
 # tRNA screening
 
@@ -77,25 +65,25 @@ rule aragorn:
     output: 'tRNA_screening/{myrast}_aragorn.fasta'
     shell: 'aragorn -t -o {output} {input}'
 
-rule tRNAscan:
-    input: '{myrast_dna}.fasta'
-    output: 'tRNA_screening/{myrast_dna}.fasta'
-    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
+#rule tRNAscan:
+#    input: '{myrast_dna}.fasta'
+#    output: 'tRNA_screening/{myrast_dna}.fasta'
+#    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
 # Transmembrane domains
 
 # TODO: run trial with toy data for checking output file extension
-rule phobius:
-    input: '{myrast}.fasta'
-    output: 'transmembrane/phobius/{myrast}.txt'
-    shell: 'phobius.pl {input}'
+#rule phobius:
+#    input: '{myrast}.fasta'
+#    output: 'transmembrane/phobius/{myrast}.txt'
+#    shell: 'phobius.pl {input}'
 
-rule tmhmm:
-    input: '{myrast}.fasta'
-    output: 'transmembrane/TMHMM/{myrast}.txt'
-    shell: 'tmhmm {input} > {output}'
+#rule tmhmm:
+#    input: '{myrast}.fasta'
+#    output: 'transmembrane/TMHMM/{myrast}.txt'
+#    shell: 'tmhmm {input} > {output}'
 
 rule final_multiqc_report:
-    input: '
-    output: '
+    input: ''
+    output: ''
     shell: 'multiqc'
