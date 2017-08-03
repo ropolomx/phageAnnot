@@ -80,7 +80,5 @@ rule tmhmm:
 
 # TODO: CLUSTALW
 rule clustalw:
-    input:
-    output:
-    shell:
-    
+    input:'{myrast_AA}.fasta'
+
