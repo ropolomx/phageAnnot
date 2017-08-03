@@ -10,7 +10,7 @@ PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
 rule all:
     input: FINAL
 
-# Make quality checks, pre-processing, assembly, and annotation optional
+# TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
 # Generate FASTQC reports
 
@@ -26,6 +26,8 @@ rule multiqc:
     output: 'qc/{reads}_multiqc.html'
     shell: 'multiqc'
 
+# Assemble with SPAdes
+
 rule spades:
     input: '{sample}.fastq'
     output: 'spades/{sample}_spades/contigs.fasta', dir='spades/{sample}_spades'
@@ -33,10 +35,10 @@ rule spades:
 
 # Annotate assemblies with myRAST
 
-rule myrast:
-    input: 'spades/{sample}_spades/contigs.fasta'
-    output: 'myRAST/{sample}.gbk'
-    shell: 'myrast'
+#rule myrast:
+#    input: 'spades/{sample}_spades/contigs.fasta'
+#    output: 'myRAST/{sample}.gbk'
+#    shell: 'myrast'
 
 rule genbank_to_aa_fasta:
     input: '{myrast}.gbk'
@@ -95,4 +97,5 @@ rule tmhmm:
 # TODO: CLUSTALW
 rule clustalw:
     input:'{myrast_AA}.fasta'
-
+    output: '{myrast_AA}_clustalw.fasta'
+    shell: 'clustalw {input} {output}'
