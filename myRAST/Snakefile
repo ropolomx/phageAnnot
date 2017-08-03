@@ -8,7 +8,7 @@ PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
 FINAL = expand("mafft/{sample}_aligned.fasta", sample=SAMPLE)
 
 rule all:
-    input: 'report.pdf'
+    input: 'report.html'
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -16,14 +16,14 @@ rule all:
 
 rule fastqc_analysis:
     input: '{reads}.fastq'
-    output: 'qc/{reads}_fastqc.html'
-    shell: 'fastqc {input}'
+    output: 'quality/fastqc/{reads}_fastqc.html', dir='quality/fastqc'
+    shell: 'fastqc {input} -o {output.dir}'
 
 # Aggregate FASTQC reports with MultiQC
 
 rule multiqc:
-    input: '{reads}_fastqc.html'
-    output: 'qc{reads}_multiqc/{reads}_multiqc.html', dir='qc/{reads}_multiqc'
+    input: 'quality/fastqc/{reads}_fastqc.html'
+    output: 'quality/multiqc/multiqc_report.html', dir='quality/multiqc'
     shell: 'multiqc -o {output.dir}'
 
 # Assemble with SPAdes
@@ -43,7 +43,7 @@ rule spades:
 rule genbank_to_aa_fasta:
     input: '{myrast}.gbk'
     output: '{myrast}.fasta'
-    script: 'blastMyRAST.py'
+    script: '../myRASTtoFASTA.py {input}'
 
 #Need to write script for this, or add function to script above
 
