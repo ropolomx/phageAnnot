@@ -1,2 +1,2 @@
 # Path to BLAST protein directory
-blastdb: viridaeProt
+blastdb: /media/amr_storage/blastdb/blastp/viridae/

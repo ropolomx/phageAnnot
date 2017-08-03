@@ -4,39 +4,84 @@ from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 from Bio.Alphabet import IUPAC
+import argparse
+
+
+def arguments():
+    parser = argparse.ArgumentParser(description='Convert GenBank CDS to AA FASTA')
+    parser.add_argument('annotation', help='GenBank-formatted annotation file from myRAST or Prokka')
 
 # Parse Genbank file
 
-myRASTGB = [r for r in SeqIO.parse(myRast, 'genbank')
+def readGenbank(myRast):
 
-# Converting CDS regions from Gebank file to FASTA for blastp/psiblast search
+    """
+    Read and Parse Seq Records from Genbank file
+    """
 
-headers = []
+    myRASTGB = [r for r in SeqIO.parse(myRast, 'genbank')]
 
-descriptions = []
-
-translations = []
-
-for r in recs:
-    for feature in r.features:
-        if feature.type == "CDS":
-            headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0])
-            descriptions.append(feature.qualifiers['product'][0]]))
-            translations.append(feature.qualifiers['translation'][0])
+    return myRASTGB
 
 
-# Zip headers, descriptions, and translated sequences into a zip object with tuples
-# Returns an iterator of tuples
+def parseGenbankInfo(recs):
 
-fastaTuple = zip(headers, descriptions, translations)
+    """
+    Parse sequence records headers, descriptions and translated CDS sequences from
+    the Genbank file
+    """
 
-# List comprehension to generate new sequence records from the information
-# generated in the tuple above
+    headers = []
 
-# TODO: fix description
+    descriptions = []
 
-newRecs = [SeqRecord(Seq(f[2], IUPAC.protein), id=f[0], name=f[0], description=f[1]) for f in fastaTuple]
+    translations = []
 
-# Write new records as FASTA
+    for r in recs:
+        for feature in r.features:
+            if feature.type == "CDS":
+                headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0])
+                descriptions.append(feature.qualifiers['product'][0]]))
+                translations.append(feature.qualifiers['translation'][0])
 
-SeqIO.write(newRecs, 'newRecs.fasta', 'fasta')
+    return headers, descriptions, translations
+
+
+
+def zipSeqRecords(headers, descriptions, translations):
+
+    """
+    Zip headers, descriptions, and translated sequences into a zip iterable with tuples
+    """
+
+    fastaTuple = zip(headers, descriptions, translations)
+
+    return fastaTuple
+
+def writeFasta(fastaTuple):
+    """
+    List comprehension to generate new sequence records from the information
+    generated in the tuple above
+    """
+    newRecs = [SeqRecord(Seq(f[2], IUPAC.protein),
+        id=f[0],
+        name=f[0],
+        description=f[1]) for f in fastaTuple]
+
+    # Write new records as FASTA
+    return SeqIO.write(newRecs, 'newRecs.fasta', 'fasta')
+
+def main():
+
+    args = arguments()
+
+    genbankRecs = readGenbank(args.annotation)
+
+    fastaElements = parseGenbankInfo(genbankRecs)
+
+    zipped = zipSeqRecords(fastaElements)
+
+    writeFasta(zipped)
+
+if __name__ == '__main__':
+    main()

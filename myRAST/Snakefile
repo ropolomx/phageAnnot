@@ -5,10 +5,10 @@ configfile: "config.yaml"
 
 PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
 
-#FINAL = expand("mafft/{sample}_aligned.fasta", sample=SAMPLE)
+FINAL = expand("mafft/{sample}_aligned.fasta", sample=SAMPLE)
 
 rule all:
-    input: FINAL
+    input: 'report.pdf'
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -17,14 +17,14 @@ rule all:
 rule fastqc_analysis:
     input: '{reads}.fastq'
     output: 'qc/{reads}_fastqc.html'
-    shell: 'fastqc'
+    shell: 'fastqc {input}'
 
 # Aggregate FASTQC reports with MultiQC
 
 rule multiqc:
     input: '{reads}_fastqc.html'
-    output: 'qc/{reads}_multiqc.html'
-    shell: 'multiqc'
+    output: 'qc{reads}_multiqc/{reads}_multiqc.html', dir='qc/{reads}_multiqc'
+    shell: 'multiqc -o {output.dir}'
 
 # Assemble with SPAdes
 
@@ -82,20 +82,20 @@ rule tRNAscan:
     output: 'tRNA_screening/{myrast_dna}.fasta'
     shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
+# Transmembrane domains
+
 # TODO: run trial with toy data for checking output file extension
 rule phobius:
     input: '{myrast}.fasta'
     output: 'transmembrane/phobius/{myrast}.txt'
     shell: 'phobius.pl {input}'
 
-# TODO: receive the program from CBS Denmark and check usage
 rule tmhmm:
     input: '{myrast}.fasta'
     output: 'transmembrane/TMHMM/{myrast}.txt'
     shell: 'tmhmm {input} > {output}'
 
-# TODO: CLUSTALW
-rule clustalw:
-    input:'{myrast_AA}.fasta'
-    output: '{myrast_AA}_clustalw.fasta'
-    shell: 'clustalw {input} {output}'
+rule final_multiqc_report:
+    input: '
+    output: '
+    shell: 'multiqc'
