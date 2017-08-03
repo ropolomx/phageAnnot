@@ -10,6 +10,7 @@ import argparse
 def arguments():
     parser = argparse.ArgumentParser(description='Convert GenBank CDS to AA FASTA')
     parser.add_argument('annotation', help='GenBank-formatted annotation file from myRAST or Prokka')
+    return parser.parse_args()
 
 # Parse Genbank file
 
@@ -39,8 +40,8 @@ def parseGenbankInfo(recs):
     for r in recs:
         for feature in r.features:
             if feature.type == "CDS":
-                headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0]])
-                descriptions.append(feature.qualifiers['product'][0]]))
+                headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0]]))
+                descriptions.append(feature.qualifiers['product'][0])
                 translations.append(feature.qualifiers['translation'][0])
 
     return headers, descriptions, translations
