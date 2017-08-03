@@ -10,6 +10,21 @@ PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
 rule all:
     input: FINAL
 
+rule fastqc_analysis:
+    input: '{reads}.fastq'
+    output: 'qc/{reads}_fastqc.html'
+    shell: 'fastqc'
+
+rule multiqc:
+    input: '{reads}_fastqc.html'
+    output: 'qc/{reads}_multiqc.html'
+    shell: 'multiqc'
+
+rule spades:
+    input: '{sample}.fastq'
+    output: 'spades/{sample}_spades/contigs.fasta', dir='spades/{sample}_spades'
+    shell: 'spades.py -s {input} -o {output.dir}'
+
 rule genbank_to_aa_fasta:
     input: '{myrast}.gbk'
     output: '{myrast}.fasta'
@@ -32,7 +47,7 @@ rule psiblast:
 rule transterm_terminator:
     input: '{myrast}.fasta'
     output: 'transterm/{transterm}.tt'
-    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}
+    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
 
 #rule compare_annotations:
 #    input: ''
@@ -44,12 +59,12 @@ rule transterm_terminator:
 rule aragorn:
     input: '{myrast_dna}.fasta'
     output: 'tRNA_screening/{myrast}_aragorn.fasta'
-    shell: 'aragorn -t -o {output} {input}
+    shell: 'aragorn -t -o {output} {input}'
 
 rule tRNAscan:
-    input: '{myrast_dna}.fasta
+    input: '{myrast_dna}.fasta'
     output: 'tRNA_screening/{myrast_dna}.fasta'
-    shell: tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)
+    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
 # TODO: run trial with toy data for checking output file extension
 rule phobius:
@@ -69,4 +84,3 @@ rule clustalw:
     output:
     shell:
     
-

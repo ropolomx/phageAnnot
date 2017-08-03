@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
@@ -21,15 +20,15 @@ translations = []
 for r in recs:
     for feature in r.features:
         if feature.type == "CDS":
-            headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0]) 
-            descriptions.append(feature.qualifiers['product'][0]])) 
+            headers.append('_'.join([r.name, feature.qualifiers['locus_tag'][0])
+            descriptions.append(feature.qualifiers['product'][0]]))
             translations.append(feature.qualifiers['translation'][0])
 
 
 # Zip headers, descriptions, and translated sequences into a zip object with tuples
 # Returns an iterator of tuples
 
-fastaTuple = zip(headers, descriptions, translations) 
+fastaTuple = zip(headers, descriptions, translations)
 
 # List comprehension to generate new sequence records from the information
 # generated in the tuple above
