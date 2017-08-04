@@ -47,7 +47,7 @@ rule all:
 
 rule genbank_to_fastas:
     input: '../Genbank/{myrast}.gbk'
-    otput: aa='{myrast}_aa.fasta'
+    output: aa='fastas/{myrast}_aa.fasta', nt='fastas/{myrast}_genome.fasta'
     shell: '../annotationToFASTA.py {input}'
 
 # Homolog search with psiblast
