@@ -71,7 +71,7 @@ def writeGenomeFasta(recs, outputGenomeFile):
     Writes genome sequence to a nucleotide FASTA file
     """
 
-    return SeqIO.write(recs, outGenomeFile, 'fasta')
+    return SeqIO.write(recs, outputGenomeFile, 'fasta')
 
 
 def main():
@@ -82,9 +82,9 @@ def main():
 
     fastaElements = parseGenbankCDS(genbankRecs)
 
-    writeaminoFasta(fastaElements, args.amino)
+    writeAminoFasta(fastaElements, args.amino)
 
-    writegenomeFasta(args.annotation, args.genome)
+    writeGenomeFasta(genbankRecs, args.genome)
 
 if __name__ == '__main__':
     main()
