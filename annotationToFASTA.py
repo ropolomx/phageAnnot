@@ -70,6 +70,7 @@ def writeGenomeFasta(recs, outputGenomeFile):
     """
     Writes genome sequence to a nucleotide FASTA file
     """
+# Keep an eye on Genbank records with multiple genomes
 
     return SeqIO.write(recs, outputGenomeFile, 'fasta')
 

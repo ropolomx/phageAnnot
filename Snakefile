@@ -6,10 +6,10 @@ SAMPLEDIR = config['genbank']
 
 PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR) if f.endswith('.gbk')] 
 
-BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
+ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
 
 rule all:
-    input: BLAST
+    input:ARAGORN
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -46,12 +46,13 @@ rule all:
 
 rule genbank_to_fastas:
     input: 'Genbank/{myrast}.gbk'
-    output: aa='fastas/{myrast}_aa.fasta', nt='fastas/{myrast}_genome.fasta'
+    output: aa='fastas/{myrast}_amino.fasta', nt='fastas/{myrast}_genome.fasta'
     shell: 'annotationToFASTA.py -a {output.aa} -g {output.nt} {input}'
 
 # Homolog search with psiblast
+
 rule psiblast:
-    input: '{phage}_aa.fasta'
+    input: '{phage}_amino.fasta'
     output: 'psiblast/{phage}_psiblast.tab'
     shell: 'psiblast -i {input} -db {config[blastdb]} -outfmt 6 -o {output}'
 
@@ -67,7 +68,7 @@ rule psiblast:
 # tRNA screening
 
 rule aragorn:
-    input: '{myrast_dna}.fasta'
+    input: 'fastas/{myrast}_genome.fasta'
     output: 'tRNA_screening/{myrast}_aragorn.fasta'
     shell: 'aragorn -t -o {output} {input}'
 
