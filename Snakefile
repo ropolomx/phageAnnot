@@ -1,15 +1,21 @@
 import os
 
+# Globals 
 configfile: 'config.yaml'
 
+# Path to the directory with Genbank files
 SAMPLEDIR = config['genbank']
 
+# Names of bacteriophages
 PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR) if f.endswith('.gbk')] 
 
+# Names of BLAST and ARAGORN targets
+
+BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
 
 rule all:
-    input:ARAGORN
+    input: BLAST, ARAGORN
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -47,14 +53,14 @@ rule all:
 rule genbank_to_fastas:
     input: 'Genbank/{myrast}.gbk'
     output: aa='fastas/{myrast}_amino.fasta', nt='fastas/{myrast}_genome.fasta'
-    shell: 'annotationToFASTA.py -a {output.aa} -g {output.nt} {input}'
+    shell: './annotationToFASTA.py -a {output.aa} -g {output.nt} {input}'
 
 # Homolog search with psiblast
 
 rule psiblast:
-    input: '{phage}_amino.fasta'
-    output: 'psiblast/{phage}_psiblast.tab'
-    shell: 'psiblast -i {input} -db {config[blastdb]} -outfmt 6 -o {output}'
+    input: 'fastas/{myrast}_amino.fasta'
+    output: 'psiblast/{myrast}_psiblast.tab'
+    shell: 'psiblast -query {input} -db {config[blastdb]} -outfmt 6 -out {output}'
 
 # Promoter prediction: need to download neural network software
 
