@@ -9,7 +9,6 @@ PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR
 BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 
 rule all:
-#    input: "report.html"
     input: BLAST
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
@@ -48,7 +47,7 @@ rule all:
 rule genbank_to_fastas:
     input: 'Genbank/{myrast}.gbk'
     output: aa='fastas/{myrast}_aa.fasta', nt='fastas/{myrast}_genome.fasta'
-    shell: 'annotationToFASTA.py {input}'
+    shell: 'annotationToFASTA.py -a {output.aa} -g {output.nt} {input}'
 
 # Homolog search with psiblast
 rule psiblast:
@@ -67,10 +66,10 @@ rule psiblast:
 
 # tRNA screening
 
-#rule aragorn:
-#    input: '{myrast_dna}.fasta'
-#    output: 'tRNA_screening/{myrast}_aragorn.fasta'
-#    shell: 'aragorn -t -o {output} {input}'
+rule aragorn:
+    input: '{myrast_dna}.fasta'
+    output: 'tRNA_screening/{myrast}_aragorn.fasta'
+    shell: 'aragorn -t -o {output} {input}'
 
 #rule tRNAscan:
 #    input: '{myrast_dna}.fasta'

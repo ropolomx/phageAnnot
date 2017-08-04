@@ -8,8 +8,9 @@ import argparse
 
 
 def arguments():
-    parser = argparse.ArgumentParser(description='Convert GenBank CDS to AA FASTA')
-    parser.add_argument('-o','--output', required=True, help='Name of output file')
+    parser = argparse.ArgumentParser(description='Convert GenBank CDS to AA and genome to FASTA')
+    parser.add_argument('-a','--amino', required=True, help='Name of aminoacid FASTA file output')
+    parser.add_argument('-g','--genome', required=True, help='Name of nucleotide genome FASTA file output')
     parser.add_argument('annotation', help='GenBank-formatted annotation file from myRAST or Prokka')
     return parser.parse_args()
 
@@ -25,7 +26,7 @@ def readGenbank(myRast):
 
     return myRASTGB
 
-def parseGenbankInfo(recs):
+def parseGenbankCDS(recs):
 
     """
     Parse sequence records headers, descriptions and translated CDS sequences from
@@ -49,11 +50,12 @@ def parseGenbankInfo(recs):
 
     return fastaTuple
 
-def writeFasta(fastaInfo, outputFile):
+def writeAminoFasta(fastaInfo, outputAminoFile):
 
     """
     List comprehension to generate new sequence records from the information
-    generated in the tuple above
+    generated in the tuple above. Returns writing sequence records into an aminoacid
+    FASTA file
     """
     newRecs = [SeqRecord(Seq(f[2], IUPAC.protein),
         id=f[0],
@@ -61,7 +63,16 @@ def writeFasta(fastaInfo, outputFile):
         description=f[1]) for f in fastaInfo]
 
     # Write new records as FASTA
-    return SeqIO.write(newRecs, outputFile,'fasta')
+    return SeqIO.write(newRecs, outputAminoFile,'fasta')
+
+def writeGenomeFasta(recs, outputGenomeFile):
+
+    """
+    Writes genome sequence to a nucleotide FASTA file
+    """
+
+    return SeqIO.write(recs, outGenomeFile, 'fasta')
+
 
 def main():
 
@@ -69,9 +80,11 @@ def main():
 
     genbankRecs = readGenbank(args.annotation)
 
-    fastaElements = parseGenbankInfo(genbankRecs)
+    fastaElements = parseGenbankCDS(genbankRecs)
 
-    writeFasta(fastaElements, args.output)
+    writeaminoFasta(fastaElements, args.amino)
+
+    writegenomeFasta(args.annotation, args.genome)
 
 if __name__ == '__main__':
     main()
