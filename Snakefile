@@ -13,9 +13,10 @@ PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR
 
 BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
+TMHMM = expand("transmembrane/TMHMM/{phage}_tmhmm.txt", phage=PHAGES)
 
 rule all:
-    input: BLAST, ARAGORN
+    input: BLAST, ARAGORN, TMHMM
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -85,16 +86,16 @@ rule aragorn:
 
 # Transmembrane domains
 
-# TODO: run trial with toy data for checking output file extension
+#TODO: run trial with toy data for checking output file extension
 #rule phobius:
 #    input: '{myrast}.fasta'
 #    output: 'transmembrane/phobius/{myrast}.txt'
 #    shell: 'phobius.pl {input}'
 
-#rule tmhmm:
-#    input: '{myrast}.fasta'
-#    output: 'transmembrane/TMHMM/{myrast}.txt'
-#    shell: 'tmhmm {input} > {output}'
+rule tmhmm:
+    input: 'fastas/{myrast}_amino.fasta'
+    output: 'transmembrane/TMHMM/{myrast}_tmhmm.txt'
+    shell: 'tmhmm {input} > {output}'
 
 #rule final_multiqc_report:
 #    input: ''
