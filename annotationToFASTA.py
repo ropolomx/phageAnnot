@@ -9,6 +9,7 @@ import argparse
 
 def arguments():
     parser = argparse.ArgumentParser(description='Convert GenBank CDS to AA FASTA')
+    parser.add_argument('-o','--output', required=True, help='Name of output file')
     parser.add_argument('annotation', help='GenBank-formatted annotation file from myRAST or Prokka')
     return parser.parse_args()
 
@@ -48,7 +49,7 @@ def parseGenbankInfo(recs):
 
     return fastaTuple
 
-def writeFasta(fastaInfo):
+def writeFasta(fastaInfo, outputFile):
 
     """
     List comprehension to generate new sequence records from the information
@@ -60,7 +61,7 @@ def writeFasta(fastaInfo):
         description=f[1]) for f in fastaInfo]
 
     # Write new records as FASTA
-    return SeqIO.write(newRecs, 'newRecs.fasta', 'fasta')
+    return SeqIO.write(newRecs, outputFile,'fasta')
 
 def main():
 
@@ -70,7 +71,7 @@ def main():
 
     fastaElements = parseGenbankInfo(genbankRecs)
 
-    writeFasta(fastaElements)
+    writeFasta(fastaElements, args.output)
 
 if __name__ == '__main__':
     main()
