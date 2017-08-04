@@ -1,35 +1,40 @@
 import os
-import glob
 
-configfile: "config.yaml"
+configfile: 'config.yaml'
 
-PHAGE = [os.path.basename(f)[0] for f in glob.glob('*.gbk')]
+SAMPLEDIR = config['genbank']
+
+PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR) if f.endswith('.gbk')] 
+
+BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 
 rule all:
-    input: 'report.html'
+#    input: "report.html"
+    input: BLAST
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
 # Generate FASTQC reports
 
-rule fastqc_analysis:
-    input: '{reads}.fastq'
-    output: 'quality/fastqc/{reads}_fastqc.html', dir='quality/fastqc'
-    shell: 'fastqc {input} -o {output.dir}'
+#rule fastqc_analysis:
+#    input: 'config["samples"]/{reads}.fastq'
+#    output: 'quality/fastqc_{reads}/{reads}_fastqc.html', dir='quality/fastqc_{reads}'
+#    shell: 'fastqc {input} -o {output.dir}'
 
 # Aggregate FASTQC reports with MultiQC
+# TODO: Fix the input names. Maybe with expand...
 
-rule multiqc:
-    input: 'quality/fastqc/{reads}_fastqc.html'
-    output: 'quality/multiqc/multiqc_report.html', dir='quality/multiqc'
-    shell: 'multiqc -o {output.dir}'
+#rule multiqc:
+#    input: 'quality/fastqc_*/*_fastqc.html'
+#    output: 'quality/multiqc/multiqc_report.html', dir='quality/multiqc'
+#    shell: 'multiqc -o {output.dir}'
 
 # Assemble with SPAdes
 
-rule spades:
-    input: '{sample}.fastq'
-    output: 'spades/{sample}_spades/contigs.fasta', dir='spades/{sample}_spades'
-    shell: 'spades.py -s {input} -o {output.dir}'
+#rule spades:
+#    input: '{sample}.fastq'
+#    output: 'spades/{sample}_spades/contigs.fasta', dir='spades/{sample}_spades'
+#    shell: 'spades.py -s {input} -o {output.dir}'
 
 # Annotate assemblies with myRAST
 
@@ -38,16 +43,18 @@ rule spades:
 #    output: 'myRAST/{sample}.gbk'
 #    shell: 'myrast'
 
+#TODO: fix output of conversion script
+
 rule genbank_to_fastas:
-    input: '{myrast}.gbk'
-    output: amino='{myrast}_aa.fasta', nt='{myrast}_genome.fasta'
-    script: '../annotationToFASTA.py {input}'
+    input: '../Genbank/{myrast}.gbk'
+    otput: aa='{myrast}_aa.fasta'
+    shell: '../annotationToFASTA.py {input}'
 
 # Homolog search with psiblast
 rule psiblast:
     input: '{phage}_aa.fasta'
     output: 'psiblast/{phage}_psiblast.tab'
-    shell: 'psiblast -i {input} -db {config[blastdb]} -o {output}'
+    shell: 'psiblast -i {input} -db {config[blastdb]} -outfmt 6 -o {output}'
 
 # Promoter prediction: need to download neural network software
 
@@ -60,10 +67,10 @@ rule psiblast:
 
 # tRNA screening
 
-rule aragorn:
-    input: '{myrast_dna}.fasta'
-    output: 'tRNA_screening/{myrast}_aragorn.fasta'
-    shell: 'aragorn -t -o {output} {input}'
+#rule aragorn:
+#    input: '{myrast_dna}.fasta'
+#    output: 'tRNA_screening/{myrast}_aragorn.fasta'
+#    shell: 'aragorn -t -o {output} {input}'
 
 #rule tRNAscan:
 #    input: '{myrast_dna}.fasta'
@@ -83,7 +90,7 @@ rule aragorn:
 #    output: 'transmembrane/TMHMM/{myrast}.txt'
 #    shell: 'tmhmm {input} > {output}'
 
-rule final_multiqc_report:
-    input: ''
-    output: ''
-    shell: 'multiqc'
+#rule final_multiqc_report:
+#    input: ''
+#    output: ''
+#    shell: 'multiqc .'

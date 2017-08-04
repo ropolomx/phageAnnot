@@ -44,20 +44,12 @@ def parseGenbankInfo(recs):
                 descriptions.append(feature.qualifiers['product'][0])
                 translations.append(feature.qualifiers['translation'][0])
 
-    return headers, descriptions, translations
-
-
-def zipSeqRecords(headers, descriptions, translations):
-
-    """
-    Zip headers, descriptions, and translated sequences into a zip iterable with tuples
-    """
-
     fastaTuple = zip(headers, descriptions, translations)
 
     return fastaTuple
 
-def writeFasta(fastaTuple):
+def writeFasta(fastaInfo):
+
     """
     List comprehension to generate new sequence records from the information
     generated in the tuple above
@@ -65,7 +57,7 @@ def writeFasta(fastaTuple):
     newRecs = [SeqRecord(Seq(f[2], IUPAC.protein),
         id=f[0],
         name=f[0],
-        description=f[1]) for f in fastaTuple]
+        description=f[1]) for f in fastaInfo]
 
     # Write new records as FASTA
     return SeqIO.write(newRecs, 'newRecs.fasta', 'fasta')
@@ -78,9 +70,7 @@ def main():
 
     fastaElements = parseGenbankInfo(genbankRecs)
 
-    zipped = zipSeqRecords(fastaElements)
-
-    writeFasta(zipped)
+    writeFasta(fastaElements)
 
 if __name__ == '__main__':
     main()

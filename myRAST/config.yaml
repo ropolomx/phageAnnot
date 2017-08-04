@@ -1,2 +1,6 @@
+# Path to FASTQ directory
+samples: '/home/rodrigo/phages/Ecoli_phage_20170606/raw_data/fastqs'
+# Path to GenBank directory
+genbank: '/home/rodrigo/phages/Genbank'
 # Path to BLAST protein directory
-blastdb: /media/amr_storage/blastdb/blastp/viridae/
+blastdb: '/media/amr_storage/blastdb/blastp/Viruses/sprot'
