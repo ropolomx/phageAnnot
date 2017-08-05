@@ -1,4 +1,3 @@
-
 import os
 
 # Globals 
@@ -12,12 +11,11 @@ PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR
 
 # Names of BLAST and ARAGORN targets
 
-BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
-ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
+PROKKA = expand("prokka/{phage}", phage=PHAGES)
 TMHMM = expand("transmembrane/TMHMM/{phage}_tmhmm.txt", phage=PHAGES)
 
 rule all:
-    input: BLAST, ARAGORN, TMHMM
+    input: PROKKA, TMHMM
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -59,10 +57,10 @@ rule genbank_to_fastas:
 
 # Homolog search with psiblast
 
-rule psiblast:
-    input: 'fastas/{phage}_amino.fasta'
-    output: 'psiblast/{phage}_psiblast.tab'
-    shell: 'psiblast -query {input} -db {config[blastdb]} -outfmt 6 -out {output}'
+rule prokka:
+    input: 'fastas/{phage}_genome.fasta'
+    output: dir='prokka/{phage}'
+    shell: 'prokka --kingdom Viruses --outdir {output.dir} {input}'
 
 # Promoter prediction: need to download neural network software
 
@@ -72,13 +70,6 @@ rule psiblast:
 #    input: '{phage}_aa.fasta'
 #    output: 'transterm/{transterm}.tt'
 #    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
-
-# tRNA screening
-
-rule aragorn:
-    input: 'fastas/{phage}_genome.fasta'
-    output: 'tRNA_screening/{phage}_aragorn.fasta'
-    shell: 'aragorn -fo -o {output} {input}'
 
 #rule tRNAscan:
 #    input: '{phage_dna}.fasta'
