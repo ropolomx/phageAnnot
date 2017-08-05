@@ -1,7 +1,7 @@
 import os
 
 # Globals 
-configfile: 'config.yaml'
+configfile: 'config_prokka.yaml'
 
 # Path to the directory with Genbank files
 SAMPLEDIR = config['genbank']
