@@ -76,7 +76,7 @@ rule aragorn:
 
 rule tRNAscan:
     input: 'fastas/{phage}_genome.fasta'
-    output: 'tRNA_screening/{phage_dna}.fasta'
+    output: 'tRNA_screening/{phage}.fasta'
     shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
 # Search for rho-dependent terminators
