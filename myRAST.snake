@@ -9,14 +9,16 @@ SAMPLEDIR = config['genbank']
 # Names of bacteriophages
 PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR) if f.endswith('.gbk')] 
 
-# Names of BLAST and ARAGORN targets
+# Names of target files 
 
 BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
+TRNASCAN = expand("tRNA_screening/{phage}.fasta", phage=PHAGES)
+PHOBIUS = expand("transmembrane/phobius/{phage}.txt", phage=PHAGES)
 TMHMM = expand("transmembrane/TMHMM/{phage}_tmhmm.txt", phage=PHAGES)
 
 rule all:
-    input: BLAST, ARAGORN, TMHMM
+    input: BLAST, ARAGORN, TRNASCAN, PHOBIUS, TMHMM 
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -65,13 +67,6 @@ rule psiblast:
 
 # Promoter prediction: need to download neural network software
 
-# Search for rho-dependent terminators
-
-#rule transterm_terminator:
-#    input: '{phage}_aa.fasta'
-#    output: 'transterm/{transterm}.tt'
-#    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
-
 # tRNA screening
 
 rule aragorn:
@@ -79,18 +74,25 @@ rule aragorn:
     output: 'tRNA_screening/{phage}_aragorn.fasta'
     shell: 'aragorn -fo -o {output} {input}'
 
-#rule tRNAscan:
-#    input: '{phage_dna}.fasta'
-#    output: 'tRNA_screening/{phage_dna}.fasta'
-#    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
+rule tRNAscan:
+    input: 'fastas/{phage}_genome.fasta'
+    output: 'tRNA_screening/{phage_dna}.fasta'
+    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
+
+# Search for rho-dependent terminators
+
+rule transterm_terminator:
+    input: 'fastas/{phage}_amino.fasta'
+    output: 'transmembrane/transterm/{transterm}.tt'
+    shell: 'transterm -p expterm.dat {input} {config[annotation]}.coords > {output}'
 
 # Transmembrane domains
 
 #TODO: run trial with toy data for checking output file extension
-#rule phobius:
-#    input: '{phage}.fasta'
-#    output: 'transmembrane/phobius/{phage}.txt'
-#    shell: 'phobius.pl {input}'
+rule phobius:
+    input: 'fastas/{phage}_genome.fasta'
+    output: 'transmembrane/phobius/{phage}.txt'
+    shell: 'phobius.pl {input}'
 
 rule tmhmm:
     input: 'fastas/{phage}_amino.fasta'
