@@ -12,10 +12,11 @@ PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR
 # Names of BLAST and ARAGORN targets
 
 PROKKA = expand("prokka/{phage}", phage=PHAGES)
+PHOBIUS = expand("transmembrane/phobius/{phage}.txt", phage=PHAGES)
 TMHMM = expand("transmembrane/TMHMM/{phage}_tmhmm.txt", phage=PHAGES)
 
 rule all:
-    input: PROKKA, TMHMM
+    input: PROKKA, PHOBIUS, TMHMM
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -55,7 +56,8 @@ rule genbank_to_fastas:
     output: aa='fastas/{phage}_amino.fasta', nt='fastas/{phage}_genome.fasta'
     shell: './annotationToFASTA.py -a {output.aa} -g {output.nt} {input}'
 
-# Homolog search with psiblast
+# Automated anotation with Prokka 
+#TODO: improve enforcement of output by including prokka output files
 
 rule prokka:
     input: 'fastas/{phage}_genome.fasta'
@@ -77,12 +79,11 @@ rule prokka:
 #    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
 # Transmembrane domains
-
 #TODO: run trial with toy data for checking output file extension
-#rule phobius:
-#    input: '{phage}.fasta'
-#    output: 'transmembrane/phobius/{phage}.txt'
-#    shell: 'phobius.pl {input}'
+rule phobius:
+    input: 'fastas/{phage}_genome.fasta'
+    output: 'transmembrane/phobius/{phage}.txt'
+    shell: 'phobius.pl {input}'
 
 rule tmhmm:
     input: 'fastas/{phage}_amino.fasta'

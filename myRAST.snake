@@ -13,12 +13,12 @@ PHAGES = [os.path.splitext(os.path.basename(f))[0] for f in os.listdir(SAMPLEDIR
 
 BLAST = expand("psiblast/{phage}_psiblast.tab", phage=PHAGES)
 ARAGORN = expand("tRNA_screening/{phage}_aragorn.fasta", phage=PHAGES)
-TRNASCAN = expand("tRNA_screening/{phage}.fasta", phage=PHAGES)
+#TRNASCAN = expand("tRNA_screening/{phage}.fasta", phage=PHAGES)
 PHOBIUS = expand("transmembrane/phobius/{phage}.txt", phage=PHAGES)
 TMHMM = expand("transmembrane/TMHMM/{phage}_tmhmm.txt", phage=PHAGES)
 
 rule all:
-    input: BLAST, ARAGORN, TRNASCAN, PHOBIUS, TMHMM 
+    input: BLAST, ARAGORN, PHOBIUS, TMHMM 
 
 # TODO: Make quality checks, pre-processing, assembly, and annotation optional
 
@@ -74,10 +74,10 @@ rule aragorn:
     output: 'tRNA_screening/{phage}_aragorn.fasta'
     shell: 'aragorn -fo -o {output} {input}'
 
-rule tRNAscan:
-    input: 'fastas/{phage}_genome.fasta'
-    output: 'tRNA_screening/{phage}.fasta'
-    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
+#rule tRNAscan:
+#    input: 'fastas/{phage}_genome.fasta'
+#    output: 'tRNA_screening/{phage}.fasta'
+#    shell: 'tRNAscan-SE -qQ -Y -o# -m# -f# -l# -c tRNAscan-SE.conf -s# (fasta file)'
 
 # Search for rho-dependent terminators
 
@@ -92,7 +92,7 @@ rule transterm_terminator:
 rule phobius:
     input: 'fastas/{phage}_genome.fasta'
     output: 'transmembrane/phobius/{phage}.txt'
-    shell: 'phobius.pl {input}'
+    shell: 'phobius.pl {input} > {output}'
 
 rule tmhmm:
     input: 'fastas/{phage}_amino.fasta'
