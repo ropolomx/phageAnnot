@@ -1,7 +1,7 @@
 import os
 
 # Globals 
-configfile: 'config.yaml'
+configfile: 'config_myrast.yaml'
 
 # Path to the directory with Genbank files
 SAMPLEDIR = config['genbank']
@@ -90,7 +90,7 @@ rule transterm_terminator:
 
 #TODO: run trial with toy data for checking output file extension
 rule phobius:
-    input: 'fastas/{phage}_genome.fasta'
+    input: 'fastas/{phage}_amino.fasta'
     output: 'transmembrane/phobius/{phage}.txt'
     shell: 'phobius.pl {input} > {output}'
 
