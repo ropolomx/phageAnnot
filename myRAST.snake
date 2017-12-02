@@ -64,7 +64,7 @@ rule psiblast:
     input: 'fastas/{phage}_amino.fasta'
     output: 'psiblast/{phage}_psiblast.tab'
    #shell: 'psiblast -query {input} -db {config[blastdb]} -outfmt 6 -out {output}'
-    shell: 'blastp -query {input} -db nr -outfmt 6 -out {output} -remote'
+    shell: 'psiblast -query {input} -db nr -outfmt 6 -out {output} -remote'
 
 # Promoter prediction: need to download neural network software
 
