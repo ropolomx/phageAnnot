@@ -3,4 +3,4 @@ samples: '/home/rodrigo/phages/Ecoli_phage_20170606/raw_data/fastqs'
 # Path to GenBank directory
 genbank: '/home/rodrigo/phages/Genbank'
 # Path to BLAST protein directory
-blastdb: '/media/amr_storage/blastdb/blastp/Viruses/sprot'
+#blastdb: '/media/amr_storage/blastdb/blastp/Viruses/sprot'
